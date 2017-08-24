@@ -1,0 +1,11 @@
+CREATE OR REPLACE PROCEDURE AFON.PROC_MMS_STAT
+AS
+BEGIN
+ insert into mms_stat (creation_time,final_time,src,dst,status,lastdaresult)
+  select creation_time ,final_time,decode(substr(src,1,2),'+9',substr(src,1,13),'1.',substr(src,5,18)), decode(substr(dst,1,2),'+9',substr(dst,1,13),'1.',substr(dst,5,18)),status,lastdaresult 
+   from afon_mms_40.mms_stat@LNK_VAS_MMS40
+    where 
+     creation_time between trunc(sysdate-1) and trunc(sysdate) and (src like '%PLMN%' or dst like '%PLMN%');
+COMMIT;
+END;
+/

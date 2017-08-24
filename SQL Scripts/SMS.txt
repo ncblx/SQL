@@ -1,0 +1,15 @@
+select * from afon_sms.sms_aliases
+where ADDR_SHORT like '41%'
+
+ 
+
+ 
+
+ 
+
+select * from afon_sms.sms_sme_route
+where mask_b like '40%'
+and up=33
+
+ 
+

@@ -1,0 +1,83 @@
+begin   
+
+                  
+
+if :Field_3 like ('0.1.%') or :Field_5 like ('0.1.%') and :Field_2!='GSMPort' 
+
+                then            
+
+    insert into tmp_br       
+
+        
+
+    (        
+
+        
+
+    n, sms_id, sms_fd, source_port, source_address,        
+
+        
+
+    destination_port, destination_address, priority, coding_type, text,        
+
+        
+
+    segment_cnt, msg_processing_time, point        
+
+        
+
+    )        
+
+    values (        
+
+        
+
+    sq$tmp_br.nextval, :Field_0, :Field_1, :Field_2, :Field_3,        
+
+        
+
+    :Field_4, :Field_5, :Field_6, :Field_7, :Field_8,        
+
+        
+
+    :Field_9, :Field_10, :JobPC        
+
+        
+
+    );       
+
+     
+
+ end if;          
+
+ insert        
+
+   
+
+  into in_sms_copm        
+
+   
+
+  (        
+
+  n, sms_id, sms_fd, source_port, source_address,        
+
+  destination_port, destination_address, priority, coding_type, text,        
+
+  segment_cnt, msg_processing_time, point        
+
+  )        
+
+  values (        
+
+   
+
+  SQ$IN_SMS_COPM.NEXTVAL, :Field_0, :Field_1, :Field_2, :Field_3,        
+
+  :Field_4, :Field_5, :Field_6, :Field_7, :Field_8,        
+
+  :Field_9, :Field_10, :JobPC        
+
+  );       
+
+  end;

@@ -1,0 +1,14 @@
+/* Formatted on 2009/07/09 14:58 (Formatter Plus v4.8.6) */
+DECLARE
+   o_date   NUMBER;
+--o_RetVal:=1;
+BEGIN
+   :i_addr$value := SUBSTR (:i_addr$value, -9);
+
+   SELECT TO_NUMBER (SUBSTR (SYSDATE, 9, 5) - SUBSTR (begin_work, 9, 5))
+     INTO o_date
+     FROM app
+    WHERE mob_num = :i_addr$value AND SYSDATE BETWEEN fd AND td;
+
+   DBMS_OUTPUT.put_line (o_date);
+END;

@@ -1,0 +1,23 @@
+/* Formatted on 6/6/2011 09:38:36 (QP5 v5.149.1003.31008) */
+  SELECT TO_CHAR (fd,'dd/mm/yyyy hh24:mi') as fd,
+         usage,
+         limitation,
+         TO_CHAR (fd,'dd/mm/yyyy') as DAT,
+         to_char(trunc(fd,'hh24'),'hh24:mi') as TIME
+    FROM in_estatistics_lic
+   WHERE fd BETWEEN TRUNC (SYSDATE - 7) AND TRUNC (SYSDATE) - 0.00001
+         AND license = 'USSD'
+ORDER BY fd
+
+
+  SELECT vch_fld_1 as PointCode, 
+  TO_CHAR (fd,'dd/mm/yyyy hh24:mi') as fd,
+         NUM_FLD_1 as Free,
+         NUM_FLD_2 as Used,
+         TO_CHAR (fd,'dd/mm/yyyy') as DAT,
+         to_char(trunc(fd,'hh24'),'hh24:mi') as TIME
+    FROM IN_SSP_STAT_DT
+   WHERE fd BETWEEN TRUNC (SYSDATE - 7) AND TRUNC (SYSDATE) - 0.00001
+         AND vch_fld_1 in ('CCF3951')
+ORDER BY fd
+

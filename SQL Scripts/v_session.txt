@@ -1,0 +1,2 @@
+select schemaname,status,machine,program from v$session where schemaname not like 'SYS%'-- and status='ACTIVE'
+order by machine

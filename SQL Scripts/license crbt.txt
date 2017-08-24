@@ -1,0 +1,5 @@
+crbt_licence_run
+begin
+kk_lic_f.init;
+end;
+commit;

@@ -1,0 +1,92 @@
+DECLARE
+   l_user   VARCHAR2 (100)   := 'api_user';
+   l_pwd    VARCHAR2 (100)   := '29187155';
+   l_err    VARCHAR2 (10000);
+   l_role   VARCHAR2 (100)   := 'ADMIN';
+   --l_err1 varchar2(2000);
+   l_res1   NUMBER;
+   l_res    NUMBER;
+   a        NUMBER;
+BEGIN
+   IF kk_usr_kk.init_api_user_in (l_user, l_pwd, l_err, l_role, 0, 0) <> 1
+   THEN
+      DBMS_OUTPUT.put_line ('error init user:' || l_err);
+   ELSE
+      DBMS_OUTPUT.put_line ('init user - OK');
+
+      FOR t IN (SELECT app,account,msisdn,dept
+                  FROM tmp_af_vf_br1
+                 )
+      LOOP
+       
+         l_res1 :=
+            bp_info.add_info_request (0,
+                                      79,
+                                      0,
+                                      t.msisdn,
+                                      16,
+                                      10,
+                                      t.account,
+                                      t.app,
+                                'FILE=PART1_INF NUMBER=' || '"' || t.dept
+                                      || '"'||' FILE=INF_PART_2_1',
+
+SYSDATE,
+                                      SYSDATE + 1,
+                                      10,
+                                      NULL,
+                                      NULL,
+                                      3,
+                                      1,
+                                      NULL,
+                                      NULL,
+                                      NULL,
+                                      1,
+                                      l_err
+                                     );
+      --dbms_output.put_line('value of l_res2'||l_res);
+
+      --dbms_output.put_line('value of l_res2'||l_res);
+      END LOOP;
+
+      COMMIT;
+      DBMS_OUTPUT.put_line ('value of l_res' || l_res);
+      DBMS_OUTPUT.put_line ('value of l_err' || l_err);
+   END IF;
+END;
+
+
+
+declare 
+   l_user varchar2 (100):='renata';
+   l_pwd varchar2 (100):='56212497';
+   l_err varchar2 (2000);
+   l_role varchar2 (100):='ADMIN';
+   l_res number;
+i integer;
+begin
+i:=0;
+if kk_usr_kk.init_api_user_in (l_user, l_pwd, l_err, l_role, 0, 0) <>1
+then 
+     dbms_output.put_line ('error init user:'||l_err);
+  else
+      dbms_output.put_line ('init user - OK');
+      
+     for t in (
+    select b.sum, a.mob_num,a.lang,a.up ls,a.n app from app a, TMP_AF_VF_2409 b
+    where a.up=b.account  AND SYSDATE BETWEEN a.fd AND a.td
+     )
+     
+  loop
+ 
+  l_res:=bp_info.add_info_request(0,2,0,t.mob_num,16,T.LANG,t.ls,t.app,
+  'FILE=PART1_INF SIGN=:'||'"'||to_char(t.sum)||'"'||' '||'FILE=ACTFOR$ FILE=INF77_PART_2_1',
+  sysdate,sysdate+1,10,null,null,3,1,null,null,null,1,l_err);
+  i:=i+1;
+  exit when i=121;
+  end loop;
+  commit;
+  dbms_output.put_line('value of l_res'||l_res);
+  dbms_output.put_line('value of l_err'||l_err);
+  end if ;
+  end;

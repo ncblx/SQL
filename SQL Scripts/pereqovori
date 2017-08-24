@@ -1,0 +1,4 @@
+select sum(air) as summa from num_calls where up in (select n from app where mob_num='702011322')
+and air is not null
+and (strt  between TO_DATE('01.12.2008 0:0:1','DD.MM.YYYY HH24:Mi:SS') 
+                    and TO_DATE('31.12.2008 23:59:59','DD.MM.YYYY HH24:Mi:SS')) 

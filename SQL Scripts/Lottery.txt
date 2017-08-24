@@ -1,0 +1,11 @@
+Кто сколько
+
+select ap.mob_num, count(ny.lotto_id) from ny_promo_issued_lotto_id ny, app ap
+where ny.app=ap.n
+and ap.td>sysdate
+group by ap.mob_num
+order by count(ny.lotto_id) desc
+
+Общашая количества
+
+select count(app) from ny_promo_issued_lotto_id;

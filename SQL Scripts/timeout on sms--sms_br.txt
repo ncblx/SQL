@@ -1,0 +1,10 @@
+select n,src_addr,dst_addr,submit_fd,fd,(to_char(submit_fd,'hh24')-to_char(fd,'hh24')) as hours,last_result
+from sms_br 
+where 
+fd between to_date('10/26/2009 12:56:02','mm/dd/yyyy hh24:mi:ss') 
+and to_date('10/27/2009 12:56:02','mm/dd/yyyy hh24:mi:ss')
+and 
+submit_fd between to_date('10/26/2009 12:56:02','mm/dd/yyyy hh24:mi:ss') 
+and to_date('10/27/2009 12:56:02','mm/dd/yyyy hh24:mi:ss')
+and attempt='1'
+and to_char(submit_fd,'hh24')-to_char(fd,'hh24')>1

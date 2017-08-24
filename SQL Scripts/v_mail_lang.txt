@@ -1,0 +1,1 @@
+select * from in_tmpl_body where up in (select n from in_tmpl_dsc t  where T.CNV_TYP=1 and lang=10 and td>Sysdate)

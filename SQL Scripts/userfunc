@@ -1,0 +1,47 @@
+declare
+tmpA varchar2(50);
+begin
+:o_RetVal:= 1;
+tmpA:=substr(to_char(:i_NmrA$value),4,9);
+    IF (((:i_VotedNum) >= 110) and ((:i_VotedNum) <= 140))
+        THEN
+            insert into nar_star_4100
+            (dates,num,shrt_num,msg,srv_typ)
+            values
+            (sysdate,:i_NmrA$value,:i_NmrB,:i_VotedNum,:i_ServTyp);
+            
+        else
+            :o_RetVal := 2;
+        END IF;
+
+exception 
+        when others then
+                :o_RetVal := 3;  
+
+END;
+
+
+
+declare
+tmpA varchar2(50);
+tmpB integer;
+begin
+:o_RetVal:='1';
+tmpA:=substr(to_char(:i_NmrA$value),4,9);
+tmpB:=to_number(:i_VotedNum); 
+    IF (((tmpB) > 110) and ((tmpB) < 140))  
+        THEN
+            insert into nar_star_4000
+            (dates,num,shrt_num,msg,srv_typ)
+            values
+            (sysdate,:i_NmrA$value,:i_NmrB,:i_VotedNum,:i_ServTyp);
+            
+        else
+            :o_RetVal := 2;
+        END IF;
+
+exception 
+        when others then
+                :o_RetVal := 3;  
+
+END;

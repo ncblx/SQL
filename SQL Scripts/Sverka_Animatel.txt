@@ -1,0 +1,50 @@
+SELECT   res.DAY Den, res.dd Napravlenie, SUM (res.code) Koli4estvo
+    FROM
+
+         (SELECT   SUM (REPLACE (SUBSTR (message_id, LENGTH (message_id) - 3,
+                                         2),
+                                 '-'
+                                )
+                       ) AS code,
+                   dst_channel_n AS dd, TRUNC (wd) AS DAY
+              FROM router_br
+             WHERE dst_addr NOT LIKE '99470%'
+               AND message_id LIKE ('SAR%')
+               AND dst_channel_n IN (4, 5)                               -- 
+               AND udhi = 0
+               AND wd BETWEEN TO_DATE ('01-05-2008 00:00:00',
+                                       'dd-mm-yyyy hh24:mi:ss'
+                                      )
+                          AND TO_DATE ('31-05-2008 23:59:59',
+                                       'dd-mm-yyyy hh24:mi:ss'
+                                      )
+          GROUP BY dst_channel_n, wd
+          UNION ALL
+
+          SELECT   COUNT (n) AS code, dst_channel_n AS dd, TRUNC (wd) AS DAY
+              FROM router_br
+             WHERE dst_addr NOT LIKE '99470%'
+               AND message_id LIKE ('SAR%')
+               AND dst_channel_n IN (4, 5)                               -- 
+               AND udhi = 1
+               AND wd BETWEEN TO_DATE ('01-05-2008 00:00:00',
+                                       'dd-mm-yyyy hh24:mi:ss'
+                                      )
+                          AND TO_DATE ('31-05-2008 23:59:59',
+                                       'dd-mm-yyyy hh24:mi:ss'
+                                      )
+          GROUP BY dst_channel_n, wd
+          UNION ALL
+
+          SELECT   COUNT (n) AS code, dst_channel_n AS dd, TRUNC (wd) AS DAY
+              FROM router_br
+             WHERE dst_addr NOT LIKE '99470%'
+               AND message_id NOT LIKE ('SAR%')
+               AND dst_channel_n IN (4, 5)                               --
+               AND wd BETWEEN TO_DATE ('01-05-2008 00:00:00',
+                                       'dd-mm-yyyy hh24:mi:ss'
+                                      )
+                          AND TO_DATE ('31-05-2008 23:59:59',
+                                       'dd-mm-yyyy hh24:mi:ss'
+                                      )
+          GROUP BY dst_channel_n, wd) res GROUP BY res.dd, res.DAY ORDER BY res.DAY, res.dd

@@ -1,0 +1,15 @@
+select count(*) Summary,data as Service,trunc(sysdate)-1 dates from sms_br where dst_addr='3311' and data='121' and fd>=trunc(sysdate-1) and fd<=trunc(sysdate) group by data
+UNION ALL
+select a+b,'SMSResult' DATA,trunc(sysdate)-1 from (select count(*) a from sms_br where dst_addr='3322' and data like '%ball%' and fd>=trunc(sysdate-1) and fd<=trunc(sysdate)) a,
+(select count(*) b from sms_br where dst_addr='3322' and data like '%final%' and fd>=trunc(sysdate-1) and fd<=trunc(sysdate)) b
+UNION ALL
+select count(*) ,'Real Tones' data,trunc(sysdate)-1 from sms_br where dst_addr='3333' and data='151616' and fd>=trunc(sysdate-1) and fd<=trunc(sysdate) group by data
+UNION ALL
+select count(*) ,'Java Games' data,trunc(sysdate)-1 dates from sms_br where dst_addr='3334' and data in('150085','150041') and fd>=trunc(sysdate-1) and fd<=trunc(sysdate) group by data
+UNION ALL
+select a+b+c,'Video' DATA,trunc(sysdate)-1 from (select count(*) a from sms_br where dst_addr='3335' and data like '171910' and fd>=trunc(sysdate-1) and fd<=trunc(sysdate)) a,
+(select count(*) b from sms_br where dst_addr='3335' and data like '171912' and fd>=trunc(sysdate-1) and fd<=trunc(sysdate)) b,(select count(*) c from sms_br where dst_addr='3335' and data like '171915' and fd>=trunc(sysdate-1) and fd<=trunc(sysdate)) c
+UNION ALL
+select count(*) ,'MMSinfo' data,trunc(sysdate)-1 from sms_br where dst_addr='3377' and upper(data) like 'GOAL' and fd>=trunc(sysdate-1) and fd<=trunc(sysdate)
+UNION ALL
+select count(*) ,'Dinlet' data,trunc(sysdate)-1 from sms_br where dst_addr='757' and data='100' and fd>=trunc(sysdate-1) and fd<=trunc(sysdate) group by data

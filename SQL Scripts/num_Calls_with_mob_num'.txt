@@ -1,0 +1,19 @@
+select ap.MOB_NUM 
+    from afon.num_calls n, afon.app ap  
+   where 
+     ap.n = n.up 
+     and n.num in ('3300', '3311', '3322', '3330', '3331', '3333',
+                 '3334', '3335', '3336', '3344', '3355', '3377', 
+                 '8550', '8553')
+     and n.dir like 'O' 
+     and (n.strt  between TO_DATE('14.10.2008 0:0:1','DD.MM.YYYY HH24:Mi:SS') 
+                    and TO_DATE('14.10.2008 23:59:59','DD.MM.YYYY HH24:Mi:SS')) 
+     and n.transac between
+                 (select min(t_from)from afon.cdr_transac_dates 
+                   where TO_DATE('14.10.2008 0:0:1','DD.MM.YYYY HH24:Mi:SS') 
+                    between dt_from and dt_to)
+               and
+                 (select max(t_to)from afon.cdr_transac_dates 
+                   where TO_DATE('14.10.2008 23:59:59','DD.MM.YYYY HH24:Mi:SS') 
+                    between dt_from and dt_to)
+	 and sysdate between ap.fd and ap.td		

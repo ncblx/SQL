@@ -1,0 +1,160 @@
+/* Formatted on 03.09.2012 17:11:41 (QP5 v5.163.1008.3004) */
+  SELECT TO_CHAR (fd, 'dd/mm/rrrr') date_,
+         COUNT (n) AS total,
+         SUM (DECODE (is_answered, 0, 1, 0)) AS died_in_queue,
+         SUM (DECODE (is_answered, 2, 1, 0)) AS agent_doesnt_answer,
+         SUM (DECODE (is_answered, 1, 1, 0)) AS answered,
+         --round(avg(time_wait)) as time_in_queue,
+         TRUNC (ROUND (AVG (time_wait)) / 3600) || ' h '
+         || TRUNC (
+               (ROUND (AVG (time_wait))
+                - TRUNC (ROUND (AVG (time_wait)) / 3600) * 3600)
+               / 60)
+         || ' m '
+         || (ROUND (AVG (time_wait))
+             - TRUNC (ROUND (AVG (time_wait)) / 60) * 60)
+         || ' s'
+            AS time_in_queue,
+         --round(avg(decode(is_answered,1,time_wait,2,time_wait))) as time_in_queue_answered_calls,
+         TRUNC (
+            ROUND (AVG (DECODE (is_answered,  1, time_wait,  2, time_wait)))
+            / 3600)
+         || ' h '
+         || TRUNC (
+               (ROUND (
+                   AVG (DECODE (is_answered,  1, time_wait,  2, time_wait)))
+                - TRUNC (
+                     ROUND (
+                        AVG (
+                           DECODE (is_answered,  1, time_wait,  2, time_wait)))
+                     / 3600)
+                  * 3600)
+               / 60)
+         || ' m '
+         || (ROUND (AVG (DECODE (is_answered,  1, time_wait,  2, time_wait)))
+             - TRUNC (
+                  ROUND (
+                     AVG (DECODE (is_answered,  1, time_wait,  2, time_wait)))
+                  / 60)
+               * 60)
+         || ' s'
+            AS time_in_queue_answered_calls,
+         --round(avg(decode(is_answered,0,time_wait))) as died_in_queue_time,
+         TRUNC (ROUND (AVG (DECODE (is_answered, 0, time_wait))) / 3600)
+         || ' h '
+         || TRUNC (
+               (ROUND (AVG (DECODE (is_answered, 0, time_wait)))
+                - TRUNC (
+                     ROUND (AVG (DECODE (is_answered, 0, time_wait))) / 3600)
+                  * 3600)
+               / 60)
+         || ' m '
+         || (ROUND (AVG (DECODE (is_answered, 0, time_wait)))
+             - TRUNC (ROUND (AVG (DECODE (is_answered, 0, time_wait))) / 60)
+               * 60)
+         || ' s'
+            AS died_in_queue_time,
+         --round(avg(decode(is_answered,1,time_answer))) as time_of_ring,
+         TRUNC (ROUND (AVG (DECODE (is_answered, 1, time_answer))) / 3600)
+         || ' h '
+         || TRUNC (
+               (ROUND (AVG (DECODE (is_answered, 1, time_answer)))
+                - TRUNC (
+                     ROUND (AVG (DECODE (is_answered, 1, time_answer))) / 3600)
+                  * 3600)
+               / 60)
+         || ' m '
+         || (ROUND (AVG (DECODE (is_answered, 1, time_answer)))
+             - TRUNC (ROUND (AVG (DECODE (is_answered, 1, time_answer))) / 60)
+               * 60)
+         || ' s'
+            AS time_of_ring,
+         --round(avg(decode(is_answered,1,time_connect))+avg(decode(is_answered,1,time_hold))) as time_of_talking,
+         TRUNC (
+            ROUND (
+               AVG (DECODE (is_answered, 1, time_connect))
+               + AVG (DECODE (is_answered, 1, time_hold)))
+            / 3600)
+         || ' h '
+         || TRUNC (
+               (ROUND (
+                   AVG (DECODE (is_answered, 1, time_connect))
+                   + AVG (DECODE (is_answered, 1, time_hold)))
+                - TRUNC (
+                     ROUND (
+                        AVG (DECODE (is_answered, 1, time_connect))
+                        + AVG (DECODE (is_answered, 1, time_hold)))
+                     / 3600)
+                  * 3600)
+               / 60)
+         || ' m '
+         || (ROUND (
+                AVG (DECODE (is_answered, 1, time_connect))
+                + AVG (DECODE (is_answered, 1, time_hold)))
+             - TRUNC (
+                  ROUND (
+                     AVG (DECODE (is_answered, 1, time_connect))
+                     + AVG (DECODE (is_answered, 1, time_hold)))
+                  / 60)
+               * 60)
+         || ' s'
+            AS time_of_talking,
+         SUM (
+            DECODE (is_answered,
+                    1, (CASE WHEN (time_wait BETWEEN 0 AND 10) THEN 1 END),
+                    0))
+            AS Level_10,
+         SUM (
+            DECODE (is_answered,
+                    1, (CASE WHEN (time_wait BETWEEN 11 AND 20) THEN 1 END),
+                    0))
+            AS Level_20,
+         SUM (
+            DECODE (is_answered,
+                    1, (CASE WHEN (time_wait BETWEEN 21 AND 30) THEN 1 END),
+                    0))
+            AS level_30,
+         SUM (
+            DECODE (is_answered,
+                    1, (CASE WHEN (time_wait BETWEEN 31 AND 60) THEN 1 END),
+                    0))
+            AS level_60,
+         SUM (
+            DECODE (is_answered,
+                    1, (CASE WHEN (time_connect BETWEEN 0 AND 5) THEN 1 END),
+                    0))
+            AS short_call
+    FROM acd31_thread
+   WHERE fd BETWEEN TO_DATE ('01-11-2007 00.00.00', 'dd-mm-yyyy hh24.mi.ss')
+                AND TO_DATE ('30-11-2007 23.59.59', 'dd-mm-yyyy hh24.mi.ss')
+         AND direction = 1
+         AND is_acd = 1
+         AND time_wait >= 0
+GROUP BY TO_CHAR (fd, 'dd/mm/rrrr')
+
+
+
+
+/* Formatted on 03.09.2012 17:11:57 (QP5 v5.163.1008.3004) */
+  SELECT acd31_agent_state_history.n,
+         acd31_agent_state_history.FD,
+         acd31_agent_state_history.TD,
+         acd31_agent_state_history.state,
+         acd31_agent_state_history.UP,
+         acd31_agents.login,
+         acd31_thread.TIME_WAIT,
+         acd31_thread.TIME_HOLD,
+         acd31_thread.TIME_CONNECT,
+         acd31_thread.FD
+    FROM acd31_agent_state_history, acd31_agents, acd31_thread
+   WHERE (acd31_agent_state_history.FD BETWEEN TO_DATE ('22.07.2008 00:00',
+                                                        'DD.MM.YYYY HH24:MI')
+                                           AND TO_DATE ('22.07.2008 01:00',
+                                                        'DD.MM.YYYY hh24:mi'))
+         AND (acd31_thread.FD BETWEEN TO_DATE ('22.07.2008 00:00',
+                                               'DD.MM.YYYY HH24:MI')
+                                  AND TO_DATE ('22.07.2008 01:00',
+                                               'DD.MM.YYYY hh24:mi'))
+         AND (acd31_agent_state_history.UP = acd31_agents.n)
+         AND (acd31_agent_state_history.UP = acd31_thread.first_agent)
+ORDER BY acd31_agents.login;

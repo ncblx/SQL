@@ -1,0 +1,18 @@
+(
+select trunc (a.fd,'dd'), a.r$tarif$srv, count (a.r$tarif$srv),'not service' /*app$n a, app$n a1*/
+from app a, app a1 where a.fd between trunc (sysdate,'mm') and trunc (sysdate,'dd')
+and a1.td between a.fd - numtodsinterval(10, 'SECOND') and a.fd
+and a1.n=a.n and a.r$tarif$srv <> a1.r$tarif$srv
+and not exists 
+( select * from service  ser /* service$up$srv */
+where a.n = ser.up and a.fd= ser.fd and ser.status =2)
+group by trunc (a.fd,'dd'), a.r$tarif$srv
+)
+union all
+(
+select trunc (a.fd,'dd'), a.r$tarif$srv, count (a.r$tarif$srv),'all' /*app$n a, app$n a1*/
+from app a, app a1 where a.fd between trunc (sysdate,'mm') and trunc (sysdate,'dd')
+and a1.td between a.fd - numtodsinterval(10, 'SECOND') and a.fd
+and a1.n=a.n and a.r$tarif$srv <> a1.r$tarif$srv
+group by trunc (a.fd,'dd'), a.r$tarif$srv
+)

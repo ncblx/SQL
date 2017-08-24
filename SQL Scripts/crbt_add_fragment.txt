@@ -1,0 +1,245 @@
+/* Formatted on 03.09.2012 17:16:51 (QP5 v5.163.1008.3004) */
+DECLARE
+   l_final_time        DATE;
+   l_name              VARCHAR2 (1000);
+   l_n                 NUMBER;
+   l_r_in_storage      NUMBER;
+   l_pr                NUMBER;
+   l_res               NUMBER;
+   l_bank_fr_sn        NUMBER;
+   l_bank_idf          NUMBER;
+   l_sys_idf           NUMBER;
+   lo_final_time       DATE;
+   lo_max_final_time   DATE;
+   fragment_sn         NUMBER;
+   o_RetVal            NUMBER;
+   o_ContentError      VARCHAR2 (2000);
+   i_AddrOwner_type    NUMBER := 256;
+   i_AddrOwner_value   VARCHAR2 (256);
+   i_ServiceKey        NUMBER := 1024;
+   i_FragmentID        NUMBER;
+BEGIN
+   i_AddrOwner_value := '706118787';
+   i_FragmentID := 652042;
+
+   SELECT n
+     INTO fragment_sn
+     FROM in_fragment
+    WHERE UP = 0 AND SYSDATE BETWEEN fd AND td AND idf = i_FragmentID;
+
+   o_ContentError := NULL;
+
+   -- i?iaa?yai anou ee o aaiiaioa eaeie-ieaoau o?aaiaio
+   BEGIN
+      SELECT /*+ ordered
+             use_nl (s c f)
+             index(a in_app$id_typ$id$td)
+             index(s in_service$up)
+             index(c in_cs_srv$up$td)
+             index(f in_fragment$up)
+             */
+            f.n,
+             DECODE (
+                SIGN (SYSDATE - f.final_time),
+                1, 0,
+                DECODE (
+                   SIGN (
+                        f.final_time
+                      - SYSDATE
+                      - k_Varx.GetCN ('CRBT.FrgmLiveRestForShift')),
+                   1, 0,
+                   1)),
+             f.idf
+        INTO l_bank_fr_sn, l_pr, l_bank_idf
+        FROM in_app a,
+             in_service s,
+             in_cs_srv c,
+             in_fragment f
+       WHERE     a.id = i_AddrOwner_value
+             AND a.id_typ = i_AddrOwner_type
+             AND SYSDATE BETWEEN a.fd AND a.td
+             AND s.UP = a.n
+             AND s.servicekey = i_ServiceKey
+             AND SYSDATE BETWEEN s.fd AND s.td
+             AND c.UP = s.n
+             AND SYSDATE BETWEEN c.fd AND c.td
+             AND f.UP = c.n
+             AND f.data_typ = DECODE (SIGN (-1), -1, f.data_typ, NULL)
+             AND SYSDATE BETWEEN f.fd AND f.td
+             AND (SELECT                              /*+ index(l LINKS2$N2)*/
+                        COUNT (1)
+                    FROM LINKS2 l
+                   WHERE     UP = 5858
+                         AND n2 = f.n
+                         AND spec = 1
+                         AND SYSDATE BETWEEN fd AND td) = 0;
+   EXCEPTION
+      WHEN NO_DATA_FOUND
+      THEN
+         l_pr := NULL;
+   END;
+
+   IF l_pr IS NOT NULL
+   THEN
+      -- iieo?ei idf nenoaiiiai o?aaiaioa.
+      -- i?aaiieaaaai, ?oi o?aaiaio anou ii-e?aiio, o.e. na?aen au ia aucaae yoio UF
+
+      SELECT                            /*+ index(in_fragment IN_FRAGMENT$N)*/
+            idf
+        INTO l_sys_idf
+        FROM in_fragment
+       WHERE n = fragment_sn AND SYSDATE BETWEEN fd AND td;
+
+      -- anee i?ieiiae?iaaou ii?ii e idf nenoaiiiai o?aaiaioa = idf eia?uaainy, oi i?iaeyai
+      IF l_bank_idf = l_sys_idf
+      THEN
+         -- i?iaeyai
+         l_res :=
+            kk_in_cs_frgm.set_fragment_nch (l_bank_fr_sn,
+                                            NULL,
+                                            NULL,
+                                            NULL,
+                                            NULL,
+                                            NULL,
+                                            NULL,
+                                            NULL,
+                                            NULL,
+                                            NULL,
+                                            1,
+                                            NULL,
+                                            NULL,
+                                            o_ContentError,
+                                            lo_final_time,
+                                            lo_max_final_time);
+
+         IF l_res > 0
+         THEN
+            o_RetVal := l_bank_fr_sn;
+         ELSE
+            o_RetVal := l_res;
+         END IF;
+      ELSE
+         -- eia?a caiauaai o?aaiaio
+         -- Iaeaai e oaaeei noa?ue o?aaiaio
+         /*
+         Nouanoaoao aa?iyoiinou oiai ?oi noa?ue o?aaiaio iaeoe ia iieo?aaony.
+         Yoi ioeaea, oae eae ?aiaa i?iaa?eee ?oi o aaiiaioa anou oneoaa e o?aaiaio a aaiea o iaai oieuei 1
+         */
+         SELECT /*+ ordered
+                    use_nl (s c f)
+                    index(a in_app$id_typ$id$td)
+                    index(s in_service$up)
+                    index(c in_cs_srv$up$td)
+                    index(f in_fragment$up)
+                */
+               f.n, f.r_in_storage
+           INTO l_n, l_r_in_storage
+           FROM in_app a,
+                in_service s,
+                in_cs_srv c,
+                in_fragment f
+          WHERE     a.id = i_AddrOwner_value
+                AND a.id_typ = i_AddrOwner_type
+                AND SYSDATE BETWEEN a.fd AND a.td
+                AND s.UP = a.n
+                AND s.servicekey = i_ServiceKey
+                AND SYSDATE BETWEEN s.fd AND s.td
+                AND c.UP = s.n
+                AND SYSDATE BETWEEN c.fd AND c.td
+                AND f.UP = c.n
+                AND SYSDATE BETWEEN f.fd AND f.td;
+
+         o_RetVal :=
+            kk_in_cs_frgm.term_fragment (i_AddrOwner_value,
+                                         l_n,
+                                         l_r_in_storage,
+                                         o_ContentError);
+
+         IF o_RetVal > 0
+         THEN
+            o_RetVal :=
+               kk_in_cs_frgm.copy_fragment (i_AddrOwner_value,
+                                            i_AddrOwner_type,
+                                            i_ServiceKey,
+                                            fragment_sn,
+                                            NULL,
+                                            NULL,
+                                            NULL,
+                                            l_name,
+                                            l_final_time,
+                                            o_ContentError,
+                                            NULL);
+
+            IF o_RetVal > 0
+            THEN
+               -- eeieoai o?aaiaio
+               l_res :=
+                  kk_in_cs_frgm.Link_Frgm_Srv (i_AddrOwner_value,
+                                               i_AddrOwner_type,
+                                               i_ServiceKey,
+                                               o_RetVal,
+                                               NULL,
+                                               2,
+                                               o_ContentError);
+
+               IF l_res <> 1
+               THEN
+                  o_RetVal := l_res;
+               END IF;
+            END IF;
+         END IF;
+      END IF;
+   ELSE
+      -- aiaaaeyai o?aaiaio
+      o_RetVal :=
+         kk_in_cs_frgm.Copy_Fragment (i_AddrOwner_value,
+                                      i_AddrOwner_type,
+                                      i_ServiceKey,
+                                      fragment_sn,
+                                      NULL,
+                                      NULL,
+                                      NULL,
+                                      l_name,
+                                      l_final_time,
+                                      o_ContentError,
+                                      NULL);
+
+      IF o_RetVal > 0
+      THEN
+         -- eeieoai o?aaiaio
+         l_res :=
+            kk_in_cs_frgm.Link_Frgm_Srv (i_AddrOwner_value,
+                                         i_AddrOwner_type,
+                                         i_ServiceKey,
+                                         o_RetVal,
+                                         NULL,
+                                         2,
+                                         o_ContentError);
+
+         IF l_res <> 1
+         THEN
+            o_RetVal := l_res;
+         END IF;
+      END IF;
+   END IF;
+
+   IF o_RetVal > 0
+   THEN
+      DBMS_OUTPUT.put_line (
+         'Fragment successfully aded with sn = ' || o_RetVal);
+
+      UPDATE in_fragment
+         SET replicated = 0
+       WHERE n = o_RetVal;
+   ELSE
+      DBMS_OUTPUT.put_line ('Error');
+      DBMS_OUTPUT.put_line ('Code: ' || o_ContentError);
+   END IF;
+EXCEPTION
+   WHEN OTHERS
+   THEN
+      o_RetVal := cb_api.eh (o_ContentError);
+      o_ContentError := 'CSCopyFragment.others' || CHR (13) || o_ContentError;
+      DBMS_OUTPUT.put_line ('Error');
+      DBMS_OUTPUT.put_line ('Code: ' || o_ContentError);
+END;

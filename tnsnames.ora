@@ -1,0 +1,136 @@
+MAIN_CBOSS=
+  (DESCRIPTION=
+    (ADDRESS=
+      (PROTOCOL=TCP)
+      (HOST=10.13.165.2)
+      (PORT=1521)
+    )
+    (CONNECT_DATA=
+      (SERVICE_NAME=cboss)
+    )
+  )
+
+CBOSSIN=
+  (DESCRIPTION=
+    (ADDRESS=
+      (PROTOCOL=TCP)
+      (HOST=10.13.165.54)
+      (PORT=1521)
+    )
+    (CONNECT_DATA=
+      (SERVER=dedicated)
+      (SID=cbossin)
+    )
+  )
+
+SMS=
+  (DESCRIPTION=
+    (ADDRESS=
+      (PROTOCOL=TCP)
+      (HOST=10.13.165.4)
+      (PORT=1521)
+    )
+    (CONNECT_DATA=
+      (SERVICE_NAME=sms)
+    )
+  )
+
+AFON_IP_OLD=
+  (DESCRIPTION=
+    (ADDRESS=
+      (PROTOCOL=TCP)
+      (HOST=10.20.0.77)
+      (PORT=1521)
+    )
+    (CONNECT_DATA=
+      (SERVICE_NAME=AFON_IP.azerfon.az)
+    )
+  )
+
+AFON_IP_STB_OLD=
+  (DESCRIPTION=
+    (ADDRESS=
+      (PROTOCOL=TCP)
+      (HOST=10.20.0.78)
+      (PORT=1521)
+    )
+    (CONNECT_DATA=
+      (SERVICE_NAME=AFONIP_STDB.azerfon.az)
+    )
+  )
+
+AFONIP=
+  (DESCRIPTION=
+    (ADDRESS=
+      (PROTOCOL=TCP)
+      (HOST=10.20.0.81)
+      (PORT=1521)
+    )
+    (CONNECT_DATA=
+      (SERVICE_NAME=AFONIP.AZERFON.AZ)
+    )
+  )
+
+AFONIPSTDB=
+  (DESCRIPTION=
+    (ADDRESS=
+      (PROTOCOL=TCP)
+      (HOST=10.20.0.82)
+      (PORT=1521)
+    )
+    (CONNECT_DATA=
+      (SERVICE_NAME=AFONIP_STDB.AZERFON.AZ)
+    )
+  )
+
+SMS_OLD=
+  (DESCRIPTION=
+    (ADDRESS=
+      (PROTOCOL=TCP)
+      (HOST=10.13.165.13)
+      (PORT=1521)
+    )
+    (CONNECT_DATA=
+      (SERVICE_NAME=sms)
+    )
+  )
+
+SMSC_ELNUR_STD=
+  (DESCRIPTION=
+    (ADDRESS=
+      (PROTOCOL=TCP)
+      (HOST=10.20.0.59)
+      (PORT=1521)
+    )
+    (CONNECT_DATA=
+      (SERVER=default)
+      (SERVICE_NAME=SMSCS3.azerfon.az)
+    )
+  )
+
+SMSC_ELNUR=
+  (DESCRIPTION=
+    (ADDRESS=
+      (PROTOCOL=TCP)
+      (HOST=10.20.0.85)
+      (PORT=1521)
+    )
+    (CONNECT_DATA=
+      (SERVER=default)
+      (SERVICE_NAME=SMSC)
+    )
+  )
+
+MNP=
+  (DESCRIPTION=
+    (ADDRESS=
+      (PROTOCOL=TCP)
+      (HOST=10.25.0.76)
+      (PORT=1526)
+    )
+    (CONNECT_DATA=
+      (SERVER=default)
+      (SERVICE_NAME=mds)
+    )
+  )
+

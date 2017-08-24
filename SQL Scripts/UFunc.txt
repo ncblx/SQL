@@ -1,0 +1,48 @@
+DECLARE 
+l_ret NUMBER;
+ l_crc      VARCHAR2 (2000);
+      l_tmp      VARCHAR2 (2000);
+       o_err      VARCHAR2 (2000);
+procedure output (i_Str varchar2) is
+l_Str VARCHAR2 (32000) := i_Str;
+begin
+Loop
+dbms_output.put_line (substr(l_Str, 0, 80));
+l_Str := Substr(L_Str,81);
+exit when l_str is NULL;
+End Loop;
+end;
+procedure get_debug is
+L_msg VARCHAR2(32000);
+begin
+loop
+l_msg := k_err.getnextsay;
+exit when l_msg is  null;
+output(l_msg);
+end loop;
+end;
+BEGIN
+/******************************caanu anoaaeyou naie eia*****************************/
+
+
+l_ret :=
+kk_info1.get_accumxx(i_app => 800126,
+                                  i_account => 803474,
+                                  i_mob_num => '702728522',
+--                                  i_grp => 501,
+i_grp => -1,
+                                  i_accum_level => NULL,
+                                  i_date => SYSDATE,
+                                  i_acc => NULL,
+                                  i_dbt_comment => NULL,
+                                  o_script => o_err);                                    
+                                    
+
+
+DBMS_OUTPUT.put_line ('Return:   '||l_ret);
+DBMS_OUTPUT.put_line ('Return script:   '||o_err);
+exception when others then
+get_debug;
+END;
+
+--select * from accum where up=800126

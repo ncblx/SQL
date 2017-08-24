@@ -1,0 +1,15 @@
+/* Formatted on 03.09.2012 17:10:31 (QP5 v5.163.1008.3004) */
+  SELECT creation_time,
+         final_time,
+         DECODE (SUBSTR (src, 1, 2),
+                 '+9', SUBSTR (src, 1, 13),
+                 '1.', SUBSTR (src, 5, 18)),
+         DECODE (SUBSTR (dst, 1, 2),
+                 '+9', SUBSTR (dst, 1, 13),
+                 '1.', SUBSTR (dst, 5, 18)),
+         status,
+         lastdaresult
+    FROM afon_mms_40.mms_stat@LNK_VAS_MMS40
+   WHERE creation_time BETWEEN TRUNC (SYSDATE - 1) AND TRUNC (SYSDATE)
+         AND (src LIKE '%PLMN%' OR dst LIKE '%PLMN%')
+ORDER BY creation_time DESC

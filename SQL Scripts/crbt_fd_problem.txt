@@ -1,0 +1,73 @@
+Если решение проблемы отложить нельзя, то прошу для этих абонентов прислать следующие выборки:
+select * in_service where up in (select n from in_app where id='номер абонента')
+select * from in_cs_srv where up= (in_service.n для этого абонента)
+select * from in_fragment where up= (in_cs_srv.n для этого абонента)
+select * links2 where n1= (in_fragment.up для этого абонента) and n2= (in_fragment.n для этого абонента)
+
+
+
+
+/* Formatted on 03.09.2012 17:24:57 (QP5 v5.163.1008.3004) */
+SELECT iss.td iss_td,
+       ics.td ics_td,
+       iff.final_time,
+       l.td link_td
+  FROM in_service iss,
+       in_cs_srv ics,
+       in_fragment iff,
+       links2 l,
+       in_app app
+ WHERE     iss.UP = app.n
+       AND ics.UP = iss.n
+       AND iff.UP = ics.n
+       AND l.n1 = iff.UP
+       AND l.n2 = iff.n
+       --and app.id in ('702011345')
+       AND iss.td = iff.final_time
+       AND l.TD = iff.FINAL_TIME
+       AND SYSDATE BETWEEN iff.fd AND iff.td
+       AND SYSDATE BETWEEN iss.fd AND iss.td
+       AND SYSDATE BETWEEN app.fd AND app.td
+
+	   
+	   
+
+/* Formatted on 03.09.2012 17:24:41 (QP5 v5.163.1008.3004) */
+SELECT *
+  FROM in_cs_srv
+ WHERE UP = (SELECT n
+               FROM in_service
+              WHERE     UP = (SELECT n
+                                FROM in_app
+                               WHERE id = '702000894')
+                    AND td > SYSDATE
+                    AND servicekey = 1024)
+
+
+
+/* Formatted on 03.09.2012 17:25:17 (QP5 v5.163.1008.3004) */
+SELECT /*+ ordered index(ics IN_CS_SRV$N$TD) index(inf IN_FRAGMENT$IDF) index(iss IN_SERVICE$N) index(app IN_APP$N) */
+      app.id AS MOBNUM,
+       inf.idf,
+       TO_CHAR (inf.fd, 'dd.mm.yyyy hh24:mi:ss') AS fd,
+       TO_CHAR (inf.FINAL_TIME, 'dd.mm.yyyy hh24:mi:ss') AS final
+  FROM afon_in40.in_fragment inf,
+       afon_in40.in_cs_srv ics,
+       afon_in40.in_service iss,
+       afon_in40.in_app app
+ WHERE     iss.UP = app.n
+       AND app.id = '709312099'
+       AND iss.servicekey = '1024'
+       AND iss.n = ics.UP
+       AND ics.n = inf.UP
+       AND inf.idf = '67772'
+       --AND inf.source = 9
+       --AND iss.fd between   to_date('11.12.2011 13:32:58','dd/mm/yyyy hh24:mi:ss')-1/24/12 and to_date('11.12.2011 13:32:58','dd/mm/yyyy hh24:mi:ss')+1/24/12
+       --AND ics.fd between  to_date('11.12.2011 13:32:58','dd/mm/yyyy hh24:mi:ss')-1/24/12 and to_date('11.12.2011 13:32:58','dd/mm/yyyy hh24:mi:ss')+1/24/12
+       AND inf.fd BETWEEN TO_DATE ('11.12.2011 17:52:41',
+                                   'dd/mm/yyyy hh24:mi:ss')
+                          - 1 / 24 / 12
+                      AND TO_DATE ('11.12.2011 17:52:41',
+                                   'dd/mm/yyyy hh24:mi:ss')
+                          + 1 / 24 / 12
+--AND app.td > SYSDATE

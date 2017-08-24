@@ -1,0 +1,14 @@
+select  l.n,iss.fd iss_fd,iss.td iss_td,iss.last_dt iss_last_td,ics.fd ics_fd,ics.td ics_td,iff.final_time,l.fd link_fd,l.td link_td,app.fd app_fd,app.td app_td from 
+in_service iss , in_cs_srv  ics ,  in_fragment iff , links2 l , in_app app 
+where iss.up=app.n 
+  and  ics.up = iss.n 
+  and  iff.up=ics.n 
+  and  l.n1=iff.up 
+  and l.n2=iff.n 
+ and app.id in ('702011345')
+ --and l.n in ('1018856','1020282')
+ and iss.td=iff.final_time
+ and l.TD=iff.FINAL_TIME
+ and sysdate between iff.fd and iff.td
+ and sysdate between iss.fd and iss.td
+ and sysdate between app.fd and app.td

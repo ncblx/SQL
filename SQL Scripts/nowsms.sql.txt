@@ -1,0 +1,1 @@
+select * from ssc_br where  fd between to_date('05/07/2010 00:00:01','dd/mm/yyyy hh24:mi:ss') and to_date('05/07/2010 23:59:59','dd/mm/yyyy hh24:mi:ss') and src_route='5.0.nowsms' 

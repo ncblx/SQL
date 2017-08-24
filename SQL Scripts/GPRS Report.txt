@@ -1,0 +1,12 @@
+select n.up,a.mob_num as Nomre,
+trunc(n.strt,'MM') as Tarix,
+n.services as Servis,
+round((sum(n.dur) / 1024) / 1024, 2) as "Trafik in Mb",
+sum(n.dur) as Trafik
+from afon.num_calls n,afon.app a
+where SERVICES='401'
+and a.mob_num ='703010390'
+and n.up=a.n
+and (n.strt between TO_DATE('20.09.2008 19:57:00','DD.MM.YYYY HH24:Mi:SS') and TO_DATE('23.09.2008 15:11:00','DD.MM.YYYY HH24:Mi:SS'))
+group by  n.up,a.mob_num,trunc(n.strt,'MM'),n.services 
+order by MOB_NUM

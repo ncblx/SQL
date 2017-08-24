@@ -1,0 +1,3 @@
+select * from inet_usr where id like '994707475880' and td>sysdate; 
+
+select * from inet_srv where up in (select n from inet_usr where id in ('994702242500') and td>sysdate);

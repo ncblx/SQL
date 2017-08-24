@@ -1,0 +1,9 @@
+/* Formatted on 03.09.2012 17:30:14 (QP5 v5.163.1008.3004) */
+  SELECT src_addr,
+         dst_addr,
+         data,
+         submit_fd
+    FROM sms_br
+   WHERE src_addr IN ('757', '994707444487')
+         AND dst_addr IN ('757', '994707444487')
+ORDER BY submit_fd DESC

@@ -1,0 +1,21 @@
+select max(Licevoy_schet),max(Prilojenie_Obslujivanie),Nomer_Abonenta,count(1) real_say ,count(1)-1 real_say_1, sum(Summa_bez_NDS),max(Nomer_uslugi)from 
+(select  ap.up as Licevoy_schet, n.up as Prilojenie_Obslujivanie, ap.MOB_NUM  as Nomer_Abonenta, n.air as Summa_bez_NDS, decode(n.num, '757' ,'401042' ,0) as Nomer_uslugi
+    from afon.num_calls n, afon.app ap  
+   where 
+     ap.n = n.up 
+	 and n.AIR='0.0508474576'
+	 and n.num='757'
+	 and (n.strt  between TO_DATE('17.10.2008 0:0:1','DD.MM.YYYY HH24:Mi:SS') 
+                    and TO_DATE('22.10.2008 02:59:59','DD.MM.YYYY HH24:Mi:SS')) 
+     and n.transac between
+                 (select min(t_from)from afon.cdr_transac_dates 
+                   where TO_DATE('17.10.2008 0:0:1','DD.MM.YYYY HH24:Mi:SS') 
+                    between dt_from and dt_to)
+               and
+                 (select max(t_to)from afon.cdr_transac_dates 
+                   where TO_DATE('22.10.2008 02:59:59','DD.MM.YYYY HH24:Mi:SS') 
+                    between dt_from and dt_to)
+	 and sysdate between ap.fd and ap.td
+	 order by ap.MOB_NUM desc
+	 )
+	 group by Nomer_Abonenta

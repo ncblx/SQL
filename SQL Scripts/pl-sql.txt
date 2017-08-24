@@ -1,0 +1,4 @@
+decaler
+x_firstname employee.first_name%type;
+
+

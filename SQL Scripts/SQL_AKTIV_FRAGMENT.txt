@@ -1,0 +1,9 @@
+select in_app.id,in_app.lang,temp3.idf,temp3.final_time,temp3.active from afon_in40.in_app,
+        (select in_service.up,temp2.idf,temp2.final_time,temp2.active from afon_in40.in_service, 
+            (select in_cs_srv.up,temp1.idf,temp1.final_time,in_cs_srv.active from afon_in40.in_cs_srv, 
+                (select up,idf,final_time from afon_in40.in_fragment where sysdate between fd and td and up != 0 
+                    /*and /*final_time between sysdate and td and trunc(sysdate) + 1 = trunc(final_time)*/) temp1
+    where temp1.up = in_cs_srv.n and sysdate between in_cs_srv.fd and in_cs_srv.td) temp2 
+        where in_service.n = temp2.up and sysdate between in_service.fd and in_service.td) temp3
+            where in_app.n = temp3.up and sysdate between in_app.fd and in_app.td  and in_app.id = '702941400'
+    order by lang,id,idf

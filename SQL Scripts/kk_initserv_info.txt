@@ -1,0 +1,11 @@
+declare
+resul varchar(256);
+begin
+-- Call the function
+resul := kk_initserv_info.gettplistbyapp(i_app => 823091,
+i_dt => SYSDATE,
+i_type => NULL,
+i_sep => NULL);
+resul:=kk_Initserv_Info.GetTPListByApp(823091,sysdate,1,',');
+DBMS_OUTPUT.put_line('res '||resul);
+end;

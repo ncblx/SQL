@@ -1,0 +1,4 @@
+select * from noapp order by fd desc
+
+
+//pervie 2 cifri smoret. 1-y eto voicemail, 2-ya CRBT

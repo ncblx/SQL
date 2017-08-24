@@ -1,0 +1,1 @@
+select * from in_scf_statistics where pointcode like 'USSDSes' 

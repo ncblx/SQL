@@ -1,0 +1,386 @@
+SMS Sorgular
+
+------------------------------------------------------------------
+SMS gelen ve gonderilen nomrelere bu sorgu ile  baxmaq mumkundur.-
+								 -
+select * from afon_sms.sms_br					 -
+where SRC_ADDR like '994702011339' and status in (0,1)		 -
+								 -	
+------------------------------------------------------------------
+
+Sms gonderilen aliasi yoxlamaq ucun
+
+select * from afon_sms.sms_aliases
+where ADDR_SHORT like '30693%'
+
+Sms gonderilen route yoxlamaq ucun
+
+select * from afon_sms.sms_sme_route
+where mask_b like '40%'
+and up=33
+
+
+Dinletde fraqmentlere baxmaq ucun script
+
+SELECT *
+  FROM afon_in.in_app a,
+       afon_in.in_service s,
+       afon_in.in_cs_srv c,
+       afon_in.in_fragment f
+ WHERE SYSDATE BETWEEN a.fd AND a.td
+   AND SYSDATE BETWEEN s.fd AND s.td
+   AND SYSDATE BETWEEN c.fd AND c.td
+   AND SYSDATE BETWEEN f.fd AND f.final_time
+   AND a.n = s.up
+   AND s.n = c.up
+   AND c.n = f.up
+   AND ID like '707259132'
+
+
+geden gelen smslere baxmaq. 
+
+select * from afon_sms.sms_msg where src_addr = '702011412'
+
+
+//servislerden gelen smslere baxmaq ucun, misal ucun 790 dan gelenlere bax
+select dst_addr, src_addr, data, submit_fd from AFON_SMS.sms_br where dst_addr='994702011339'
+
+
+//lisenziyani yoxlamaq ucun script CRBT
+
+select num, fd, td, active, tde from afon_in.noapp where typ='18' order by fd desc
+
+// CRBT -de sehvleri yoxlamaq ucun 
+
+select * from afon_sms.sms_br where src_addr = '757' and data like 'An exception has occurred%' order by submit_fd desc
+
+
+CRBT aktiv fraqmentlere baxmaq ucun skript
+----------------------------------------------
+
+SELECT a.n, a.id, f.idf, f.fd, f.td, f.final_time
+  FROM afon_in.in_app a,
+       afon_in.in_service s,
+       afon_in.in_cs_srv c,
+       afon_in.in_fragment f
+ WHERE SYSDATE BETWEEN a.fd AND a.td
+   AND SYSDATE BETWEEN s.fd AND s.td
+   AND SYSDATE BETWEEN c.fd AND c.td
+   AND SYSDATE BETWEEN f.fd AND f.final_time
+   AND a.n = s.up
+   AND s.n = c.up
+   AND c.n = f.up
+--   AND f.idf = 11434
+   AND ID = '702011339'
+order by f.fd desc
+
+IMEI kodlara baxmaq 
+-----------------------------------------
+
+select ap.mob_num, nc.imei, nc.strt  from afon.num_calls nc, app ap
+ where sysdate between ap.fd and ap.td
+ and nc.up=ap.n
+ and ap.mob_num='702909080'
+ order by strt
+
+Update ele
+-----------------------------------------
+update afon_sms.sms_sme_route set max_cnt=20 where n=63603
+
+
+Rassilka uspeshno otpravleno
+_______________________________________________
+SELECT r$tarif$srv, count(r$tarif$srv) FROM app ap, dbt_comments db WHERE 
+SYSDATE between ap.fd and ap.td 
+AND ap.up = db.acc 
+AND db.txt like '%??????: 360618.%' 
+AND db.status = '1' 
+group by r$tarif$srv
+
+// WeclomeRoamer maska elave olunmasi scripti
+-------------------------------------------
+INSERT INTO in_wr_operator_ids
+            (n, UP, TYPE, MASK, td,
+             fd, ac, mc, vt, city
+            )
+VALUES (sq$in_wr_operator_ids.NEXTVAL, 28, 1, '79153', TO_DATE ('1/1/2018', 'dd/mm/yyyy'),SYSDATE, NULL, NULL, NULL, NULL)
+
+// Serfeli bahar
+_______________________________________________
+
+SELECT b.mob_num 
+  FROM afon.blocking a, afon.app b
+   WHERE a.status IN ('0','16') 
+   AND a.typ = '1' 
+   AND b.mob_num LIKE '70%' 
+   AND b.r$tarif$srv IN (326, 327, 328, 1565, 2061, 2081, 2082, 2083, 2161, 2501, 2925) 
+   AND a.up = b.n 
+   AND SYSDATE BETWEEN a.fd AND a.td 
+   AND SYSDATE BETWEEN b.fd AND b.td
+
+
+//Serfeli bahar 2 gedenlere baxmaq
+------------------------------------------
+
+SELECT ap.mob_num, db.dt FROM app ap, dbt_comments db WHERE 
+SYSDATE between ap.fd and ap.td 
+AND ap.up = db.acc 
+AND db.txt like '%??????: 398553.' 
+AND db.status = '1'
+
+
+
+
+// ROUTLARI DEYISMEK
+select * from afon_sms.sms_sme_route where n IN ('63566','63567','63645','63572','63644') 
+________________________________________________
+
+// Fraqment zakaz eden abonentler - PRovayderler ucun
+------------------------------------------
+select DISTINCT(ap.id) from in_fragment fr, in_app ap where fr.source=9 
+and
+ap.n=fr.up
+and sysdate between ap.fd and ap.td
+and fr.up !=0
+and
+ fr.fd between TO_DATE('10.01.2009 0:0:1','DD.MM.YYYY HH24:Mi:SS') 
+                    and TO_DATE('10.04.2009 23:59:59','DD.MM.YYYY HH24:Mi:SS') 
+
+// Fragment zakaz edenler from - Num calls
+------------------------------------------
+
+ select ap.mob_num
+    from afon.num_calls nc, app ap, blocking bk
+   where nc.num like '757*6%'
+     and ap.n=nc.up
+	 and ap.n=bk.UP
+	 and bk.STATUS = 0
+	 and bk.typ = 1
+	 and sysdate between bk.fd and bk.td
+	 and sysdate between ap.fd and ap.td
+     and (nc.strt  between TO_DATE('01.01.2009 0:0:1','DD.MM.YYYY HH24:Mi:SS') 
+                    and TO_DATE('31.03.2009 23:59:59','DD.MM.YYYY HH24:Mi:SS')) 
+     and nc.transac between
+                 (select min(t_from)from afon.cdr_transac_dates 
+                   where TO_DATE('01.01.2009 0:0:1','DD.MM.YYYY HH24:Mi:SS') 
+                    between dt_from and dt_to)
+               and
+                 (select max(t_to)from afon.cdr_transac_dates 
+                   where TO_DATE('31.03.2009 23:59:59','DD.MM.YYYY HH24:Mi:SS') 
+                    between dt_from and dt_to)
+
+// RASSILKA
+------------------------------------
+SELECT distinct(b.mob_num) 
+  FROM afon.blocking a, afon.app_full_v b, afon.ACCOUNT ac, afon.service s 
+ WHERE a.status IN ('0','16') 
+   AND a.typ = 1 
+   AND s.up = b.n 
+   AND s.service NOT IN ('401403') 
+   AND s.service IN ('400850') 
+   AND b.mob_num LIKE '70%' 
+   AND b.tarif IN ('326','327','328','1565','2061','2081','2082','2083','2161','2501','2925') 
+   AND a.up = b.n 
+   AND b.ACCOUNT = ac.n 
+   AND ac.CATEGORY LIKE '1' 
+   AND SYSDATE BETWEEN a.fd AND a.td 
+   AND SYSDATE BETWEEN ac.fd AND ac.td 
+   AND SYSDATE BETWEEN b.fd AND b.td 
+   AND SYSDATE BETWEEN s.fd AND s.td
+
+// Gelen SMS-leri say
+-----------------------------------------
+SELECT UP, count(num)
+  FROM num_calls
+ WHERE num = '717'
+   AND (strt BETWEEN TO_DATE ('16.04.2009 00:00:00', 'DD.MM.YYYY HH24:Mi:SS')
+                 AND TO_DATE ('17.04.2009 23:59:59', 'DD.MM.YYYY HH24:Mi:SS')
+       )
+   AND transac BETWEEN (SELECT MIN (t_from)
+                          FROM cdr_transac_dates
+                         WHERE TO_DATE ('20090416000000', 'yyyymmddhh24miss')
+                                  BETWEEN dt_from
+                                      AND dt_to)
+                   AND (SELECT MAX (t_to)
+                          FROM cdr_transac_dates
+                         WHERE TO_DATE ('20090417235959', 'yyyymmddhh24miss')
+                                  BETWEEN dt_from
+                                      AND dt_to)
+having count(num) > 10 group by up
+
+
+// Gelen smslerin tarixleri arasinda saniye ferqi
+--------------------------------------------------
+
+select c.* ,  (c.strt-c.date_before)*24*60*60  seconds from  (
+select a.up,a.strt,a.air,a.num,a.services, 
+(select max(strt) from num_calls  b where b.up =a.up and b.strt<a.strt) DAte_before
+from num_calls a  
+where 
+
+    strt between to_date('20090416','yyyymmdd') and to_date('20090417','yyyymmdd')  -- tarix araligi
+AND
+    transac between  
+            (select min(t_from) from cdr_transac_dates where to_date('20090416','yyyymmdd') between dt_from and dt_to)
+                and
+            (select max(t_to) from cdr_transac_dates where to_date('20090417','yyyymmdd') between dt_from and dt_to)
+
+			and a.up IN (
+'XXXXXXX',
+'XXXXXXX'
+)
+            and a.air is not null
+			and a.services = '021'
+			and a.num = '717'
+
+) c
+
+where (c.strt-c.date_before)*24*60*60 = '120'  -- Nece saniyeden bir olan recorlari cixardsin 
+
+// Renat gonderen smslere baxmaq
+_____________________________________________________
+
+SELECT distinct(ap.mob_num) FROM app ap, dbt_comments db WHERE db.dt between TO_DATE('28.04.2009 00:00:01','DD.MM.YYYY HH24:Mi:SS') and TO_DATE('29.04.2009 15:00:00','DD.MM.YYYY HH24:Mi:SS')
+AND ap.up = db.acc 
+AND db.auto_script like 'FILE=BIRTHDAY_SPAM%' 
+AND db.status != '1'
+AND sysdate between ap.fd and ap.td
+
+// IVR-a gelen zengler 
+_____________________________________________________
+
+select to_char(fd, 'dd/mm/rrrr'), count(*) from vmenu_session where fd > TO_DATE ('20090508000001', 'yyyymmddhh24miss') 
+and td < TO_DATE ('20090520155959', 'yyyymmddhh24miss') and dtmfs like '%,51%' group by to_char(fd, 'dd/mm/rrrr')
+
+
+// Yumroo Project script
+----------------------------------------------
+
+select to_char(fd, 'DD.MM.YYYY'),
+sum(decode(short_num, '4041',1,'4141',10,0)) as N4041 , sum(decode(short_num, '4042',1,'4142',10,0)) as N4042, 
+sum(decode(short_num, '4043',1,'4143',10,0)) as N4043 , sum(decode(short_num, '4044',1,'4144',10,0)) as N4044
+from tmp_yumroo  
+where fd between
+TO_DATE('03.06.2009 0:0:1','DD.MM.YYYY HH24:Mi:SS') 
+                    and sysdate 
+group by to_char(fd, 'DD.MM.YYYY')         
+union all
+select 'Total',
+sum(decode(short_num, '4041',1,'4141',10,0)) as N4041 , sum(decode(short_num, '4042',1,'4142',10,0)) as N4042, 
+sum(decode(short_num, '4043',1,'4143',10,0)) as N4043 , sum(decode(short_num, '4044',1,'4144',10,0)) as N4044
+from tmp_yumroo  
+where fd between
+TO_DATE('03.06.2009 0:0:1','DD.MM.YYYY HH24:Mi:SS') 
+                    and sysdate
+
+// IVR & USD ile yuklenen sracth kartlara baxmaq
+___________________________________________________
+
+select a.up ACTION_IVR, a.dsc PHONE_NUMBER, p.n PAYMENT_NUM, p.amount AMOUNT from actions a, payment p where a.up='-7' // -13 USSD
+AND a.TBL='UNIT'
+AND a.r$obj$n=p.r$obj$n
+AND a.wd between TO_DATE('31.05.2009 00:00:00','DD.MM.YYYY HH24:Mi:SS') 
+             and TO_DATE('02.06.2009 23:59:59','DD.MM.YYYY HH24:Mi:SS') 
+AND p.fd between TO_DATE('31.05.2009 00:00:00','DD.MM.YYYY HH24:Mi:SS') 
+             and TO_DATE('02.06.2009 23:59:59','DD.MM.YYYY HH24:Mi:SS') 	
+
+
+// BRING_YOUR_FRIEND gondermeyenler
+--------------------------------------------
+SELECT b.mob_num 
+  FROM afon.blocking a, afon.app b
+   WHERE a.status IN ('0','16') 
+   AND a.typ = '1' 
+   AND b.r$tarif$srv IN (326, 327, 328, 1565, 2061, 2081, 2082, 2083, 2161, 2501, 2925) 
+   AND a.up = b.n 
+   AND SYSDATE BETWEEN a.fd AND a.td 
+   AND SYSDATE BETWEEN b.fd AND b.td
+   AND b.begin_work < TO_DATE('08.05.2009','DD.MM.YYYY')
+   AND EXISTS (Select 1
+               From service s
+			   Where  s.service != '401485'  // bring service olmayan
+			   AND s.up = b.n
+
+
+// BRING_YOUR_FRIEND gonderenler 6-dan az
+-------------------------------------------
+SELECT mob_num
+  FROM app, (SELECT   app_b, COUNT (*)
+                 FROM tmp_bring_your_friend
+             GROUP BY app_b
+               HAVING COUNT (*) < 6)
+ WHERE app.n = app_b AND app.td > sysdate
+/*
+
+SELECT   app_b, COUNT (*)
+    FROM tmp_bring_your_friend
+GROUP BY app_b
+  HAVING COUNT (*) < 6
+  Order by COUNT (*) DESC
+
+ select * from app
+
+ */
+
+
+\\ Report IVR - gelen zengleri saatlara gore toplami
+------------------------------------------------------------
+select trunc(fd,'HH24') tarix , sum((td - fd)*24*60)  duration   from vmenu_session
+where 
+dtmfs like '%,51%'
+AND
+fd 
+between 
+    to_date('14062009000000','ddmmyyyyhh24miss')
+    AND
+    to_date('15062009235959','ddmmyyyyhh24miss')
+
+group by trunc(fd,'HH24')
+
+
+\\ Report IVR - 747 - saatlara gorede gelen zenglerin sayi
+
+select count(mob_num), trunc(fd,'HH24') tarix from REANIM_CALL_HISTORY where fd between TO_DATE('01.07.2009 0:0:1','DD.MM.YYYY HH24:Mi:SS') 
+                    and TO_DATE('08.07.2009 23:59:59','DD.MM.YYYY HH24:Mi:SS') group by trunc(fd,'HH24')
+
+
+// Update
+update INFO_VOC_FRAGMENTS 
+set name='Usage'
+where name = 'usage'
+
+// Animatel
+_____________________________________
+select smr.mask_b Animatel, smr.mask_a, sma.addr_short,'Animatele' from afon_sms.sms_sme_route smr, afon_sms.sms_aliases sma where smr.up='33' 
+and sma.addr_short like smr.mask_b||'%'
+
+// Direct Roaming
+---------------------------------
+select sma.addr_short from afon_sms.sms_aliases sma where sma.addr_short not like '99470%' 
+MINUS
+select sma.addr_short from afon_sms.sms_sme_route smr, afon_sms.sms_aliases sma where smr.up='33' 
+and sma.addr_short like smr.mask_b||'%'
+
+
+// GRPS-SPAMOFF
+
+SELECT b.mob_num FROM afon.blocking a, afon.app b
+   WHERE a.status IN ('0','16') 
+   AND a.typ = '1' 
+   AND b.mob_num LIKE '70%' 
+   AND b.prepaid_platform='4' 
+   AND a.up = b.n 
+   AND SYSDATE BETWEEN a.fd AND a.td 
+   AND SYSDATE BETWEEN b.fd AND b.td
+   and exists
+ (select 1 from service s1 where s1.up=b.n and service=400850)
+  and not exists
+ (select 1 from service s2 where s2.up=b.n and service=401403)
+
+// 777-e gelen zenglerde menyu secimi -daily
+select substr(dtmfs, -1, 1) as menu, count(substr(dtmfs, -1, 1)) as count_subscribers from vmenu_session where fd between sysdate -1 and sysdate
+and dtmfs like '->%'
+and length(dtmfs) < 9
+and substr(dtmfs, -1, 1) not in ('A', 'B', 'C', 'D')
+group by substr(dtmfs, -1, 1)
+

@@ -1,0 +1,36 @@
+SELECT   b.mob_num
+    FROM afon.blocking a, afon.app_full_v b, afon.ACCOUNT ac, afon.service s 
+   WHERE a.status=0
+     AND a.typ = 1
+    and s.up=b.n
+    and s.service=400850
+    AND b.mob_num LIKE '70%'
+     AND b.tarif in(326,327,328,1565,2061,2081,2082,2083,2161)
+and b.mob_num not in (702403840,
+702550885,
+702577777,
+702801234,
+702859800,
+703162879,
+703162897,
+703134974,
+703203101,
+703261781,
+703306048,
+707700022,
+702301019,
+703008550,
+702301019,
+703705505,
+703444855,
+707265140,
+702859800,
+703766926)
+     AND a.up = b.n
+       and b.born>to_date('01011973','DDMMYYYY')
+     AND b.account = ac.n
+     AND ac.CATEGORY LIKE '1'
+     AND SYSDATE BETWEEN a.fd AND a.td
+     AND SYSDATE BETWEEN ac.fd AND ac.td
+     AND SYSDATE BETWEEN b.fd AND b.td
+      AND SYSDATE BETWEEN s.fd AND s.td

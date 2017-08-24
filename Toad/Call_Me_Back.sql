@@ -1,0 +1,8 @@
+/* Formatted on 30.07.2014 10:13:27 (QP5 v5.227.12220.39754) */
+SELECT *
+  FROM AFON.TMP_CALLBACK
+ WHERE dates BETWEEN TO_DATE ('27.07.2014', 'dd.mm.yyyy') 
+        AND SYSDATE
+        AND ADDRA = '708744147'
+        ORDER
+ BY dates DESC

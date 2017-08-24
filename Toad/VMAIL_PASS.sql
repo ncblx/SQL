@@ -1,0 +1,1 @@
+select * from AFON_IN40.IN_VMAIL_BOX where id ='702523400' and td = sysdate

@@ -1,0 +1,1 @@
+select * from afon.vmenu_session where mob_num='707376420' order by td

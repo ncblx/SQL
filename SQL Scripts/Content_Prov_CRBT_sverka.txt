@@ -1,0 +1,48 @@
+—крипт дл€ получени€ заказов CRBT за мес€ц.
+
+
+/* Formatted on 03.09.2012 17:14:02 (QP5 v5.163.1008.3004) */
+  SELECT term, COUNT (src) AS orders
+    FROM (SELECT DISTINCT uf.n un,
+                          uf.final_time,
+                          sf.idf,
+                          sf.n,
+                          sf.SOURCE src,
+                          dic_data.term
+            FROM afon_in.in_fragment sf,
+                 afon_in.in_fragment uf,
+                 afon_in.dic_data
+           WHERE uf.idf = sf.idf AND sf.UP = 0 AND uf.UP != 0
+                 AND TRUNC (uf.fd) BETWEEN TRUNC (
+                                              TO_DATE ('01052008', 'DDMMYYYY'))
+                                       AND TRUNC (
+                                              TO_DATE ('31052008', 'DDMMYYYY'))
+                 AND uf.fd BETWEEN sf.fd AND sf.td
+                 AND dic_data.UP = 1836
+                 AND dic_data.code = sf.SOURCE
+                 AND dic_data.lang = 1
+                 AND ( (SYSDATE BETWEEN dic_data.fd AND dic_data.td)))
+GROUP BY src, term
+
+
+
+/* Formatted on 03.09.2012 17:13:56 (QP5 v5.163.1008.3004) */
+  SELECT term, COUNT (src) AS orders
+    FROM (SELECT DISTINCT uf.n un,
+                          uf.final_time,
+                          uf.idf,
+                          uf.n,
+                          uf.SOURCE src,
+                          dic_data.term
+            FROM afon_in40.in_fragment uf, afon_in40.dic_data
+           WHERE uf.UP != 0
+                 AND uf.fd BETWEEN TO_DATE ('20110601000000',
+                                            'YYYYMMDDHH24MISS')
+                               AND TO_DATE ('20110630235959',
+                                            'YYYYMMDDHH24MISS')
+                 --AND uf.fd BETWEEN sf.fd AND sf.td
+                 AND dic_data.UP = 1836
+                 AND dic_data.code = uf.SOURCE
+                 AND dic_data.lang = 1
+                 AND ( (SYSDATE BETWEEN dic_data.fd AND dic_data.td)))
+GROUP BY src, term

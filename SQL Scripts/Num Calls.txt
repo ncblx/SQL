@@ -1,0 +1,13 @@
+SELECT  
+--decode (NC.up,1445,'Vxod',1446,'Isxod') I_O ,
+ count(*) from num_calls nc
+where   
+strt >= to_date('20101125000000', 'yyyymmddhh24miss')
+and
+strt <= to_date('20101125235959', 'yyyymmddhh24miss')
+and services='011' 
+and transac 
+between  
+(select min(t_from) from cdr_transac_dates where to_date('20101125','yyyymmdd') between dt_from and dt_to)
+and
+(select max(t_to) from cdr_transac_dates where to_date('20101125','yyyymmdd') between dt_from and dt_to)

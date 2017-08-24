@@ -1,0 +1,34 @@
+--Na4isleniya
+
+SELECT DET.EVENT_TIME,
+       REVERSE(DET.MSISDN) AS MSISDN,       
+       CASE
+         WHEN MOD(SUBSTR(REVERSE(DET.MSISDN), 4, 1), 2) = 0 AND
+              SUBSTR(DET.CALL_DETAIL_ID, 1, 2) = '01' THEN
+          'correct'
+         WHEN MOD(SUBSTR(REVERSE(DET.MSISDN), 4, 1), 2) != 0 AND
+              SUBSTR(DET.CALL_DETAIL_ID, 1, 2) = '00' THEN
+          'correct'
+         ELSE
+          'incorrect'
+       END CASE,
+       DET.UP_VOLUME AS SESSION_VOLUME,
+       DET.PRICE AS MONEY_CHARGED,
+       CP.PRICE_PEAK + CP.PRICE_PROMOTIONAL AS BONUS_CHARGED,
+       DET.B_NUMBER
+  FROM PMS_CALL_DETAIL DET
+  LEFT JOIN PMS_CALL_PARTITION CP ON CP.MSISDN = DET.MSISDN
+                                 AND CP.EVENT_TIME = DET.EVENT_TIME
+                                 AND CP.CALL_SERIAL = DET.CALL_SERIAL
+ WHERE DET.RANGE_SET_ID = '002'
+   AND DET.EVENT_TIME > SYSDATE - 300 / 86400
+   and det.msisdn = reverse('702000939')
+ ORDER BY DET.EVENT_TIME DESC
+
+
+---Na4islenya (minus balans)
+SELECT REVERSE(msisdn), det.event_time, det.b_number 
+  FROM PMS_CALL_DETAIL DET
+ WHERE END_BALANCE < 0
+   AND EVENT_TIME > SYSDATE - 300 / 86400
+   AND DET.RANGE_SET_ID = '002'

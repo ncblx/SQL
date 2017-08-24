@@ -1,0 +1,14 @@
+tail -f /var/opt/CBOSSip/log/CBSfreeradius/radius.log
+
+
+ls -la /usr/fsrv/cdr | grep 'Oct 7'
+
+
+
+ls -la /usr/fsrv/cdr | grep 'Oct 13' | tail -5
+
+
+
+@@CBOSSip.ContentPrepaidLicense
+
+select * from list_const where name = '@@CBOSSip.ContentPrepaidLicense'

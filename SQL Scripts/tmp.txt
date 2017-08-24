@@ -1,0 +1,26 @@
+select count(*) from 
+(
+
+select ia.id,ise.td,ics.fd,inf.final_time from in_service ise, in_app ia, in_cs_srv ics,in_fragment inf
+ where ise.up=ia.n 
+ and ise.n=ics.up
+ and ise.td>sysdate
+ and ia.td>sysdate
+ and ICS.td>sysdate
+ and ics.n=inf.up
+ and inf.final_time>sysdate
+ and ise.servicekey=1024
+ and  inf.final_time between to_date('23/12/2010 03:00:00','DD/MM/YYYY HH24:MI:SS') and to_date('24/12/2010 11:30:00','DD/MM/YYYY HH24:MI:SS')
+ order by inf.final_time
+ 
+ )
+
+select * from in_app where id='709147524' and td>sysdate
+
+select * from in_service where up='2399348' and td>sysdate
+
+select * from IN_CS_SRV where up=3011378
+
+select * from in_fragment where up=1703219
+
+select * from links2

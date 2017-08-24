@@ -1,0 +1,17 @@
+  select b.mob_num as "Telephone number"
+         
+    from afon.blocking a, afon.app b, afon.account ac, afon.app_full_v bc
+   where a.status IN (0, 16)
+     and a.typ = 1
+     and b.activated = 1
+     and b.status = 0
+     and b.mob_num like '70%'
+     and b.r$tarif$srv in (326, 327, 328, 1565, 2061, 2081, 2082, 2083)
+     and a.up = b.n
+     and b.up = ac.n
+     and ac.category like '1'
+     and sysdate between a.fd and a.td
+     and sysdate between ac.fd and ac.td
+     and sysdate between b.fd and b.td
+	 and bc.born>to_date('01011972','DDMMYYYY')
+order by b.lang

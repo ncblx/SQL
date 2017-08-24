@@ -1,0 +1,5 @@
+select * from CB_PATCHSET_APPLYING
+where UP=62518
+
+begin
+kk_cbpatchset.insert_applying(53736, kk_cbobj_rt.get_instance,3, 'manual inserting', k_std.sys_date, true); end;

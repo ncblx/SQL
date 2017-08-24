@@ -1,0 +1,45 @@
+select * from afon.num_calls where up in (select n from afon.app where mob_num='776011345') and
+strt >= to_date('20110228000000', 'yyyymmddhh24miss')
+and
+strt <= to_date('20110328235959', 'yyyymmddhh24miss')
+and transac 
+between  
+(select min(t_from) from afon.cdr_transac_dates where to_date('20110228','yyyymmdd') between dt_from and dt_to)
+and
+(select max(t_to) from afon.cdr_transac_dates where to_date('20110301','yyyymmdd') between dt_from and dt_to)
+order by strt desc
+
+
+select * from afon.num_calls where up in (select n from afon.app where mob_num='772011020') and
+strt >= sysdate-1/12 
+and
+strt <=sysdate
+and transac 
+between  
+(select min(t_from) from afon.cdr_transac_dates where sysdate-1/12 between dt_from and dt_to)
+and
+(select max(t_to) from afon.cdr_transac_dates where sysdate between dt_from and dt_to)
+order by strt desc
+
+
+select
+ '994703895855',a.num,a.strt as calldate,a.strt+a.dur/86400 as callenddate,
+decode(a.services,021,'incomming sms',022,'outgoing sms'),a.services,a.dir,
+s.Region,s.Address,
+a.dur,
+s.cell_id,a.cell_id,
+s.lac,a.ta,
+s.LONGITUDE,
+s.LATITUDE
+from afon.num_calls a,site2 s where a.up in (select n from afon.app where mob_num='703895855' and td>sysdate) and
+a.strt >= to_date('20120120000000', 'yyyymmddhh24miss')
+and
+a.strt <= to_date('20120210000000', 'yyyymmddhh24miss')
+and a.transac 
+between  
+(select min(t_from) from afon.cdr_transac_dates where to_date('20110120','yyyymmdd') between dt_from and dt_to)
+and
+(select max(t_to) from afon.cdr_transac_dates where to_date('20120210','yyyymmdd') between dt_from and dt_to)
+and s.cell_id=a.cell_id
+and (s.site_status='On Air' and s.OFF_AIR_DATE is null and s.lac=a.ta)
+order by a.strt desc;
